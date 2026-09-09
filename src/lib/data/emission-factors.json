@@ -1,0 +1,356 @@
+[
+  {
+    "id": "virgin-pet-production",
+    "material": "Virgin PET (bottle-grade resin pellet)",
+    "category": "production",
+    "subCategory": "virgin",
+    "value": 2.746,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "Franklin Associates, A Division of ERG — Life Cycle Inventory of 100% Postconsumer HDPE and PET Recycled Resin from Postconsumer Containers and Packaging (rev. 2011)",
+      "url": "https://petresin.org/wp-content/uploads/2023/03/Franklin-LCI-Recycled-HDPE-and-PET-Resin-2010-rev-2011.pdf",
+      "publicationYear": 2011,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "Report Table 3-5 / summary box: virgin PET production burden (2010 US resin-production baseline data used as the comparison benchmark) = 2,746 lb CO2e per 1,000 lb of resin. Numerically equal to 2.746 kg CO2e/kg since the lb:lb ratio is unit-invariant. GWP basis: IPCC Second Assessment Report (SAR) 100-year factors (CH4=21, N2O=310). Cradle-to-gate: petroleum/natural-gas extraction through finished resin pellet.",
+    "assumptions": [
+      "US average virgin PET resin production, 2010 data vintage.",
+      "Excludes downstream conversion of resin to finished packaging (e.g., extrusion, blow-molding).",
+      "Excludes materials/additives that individually total less than 1% of process inputs."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "virgin-hdpe-production",
+    "material": "Virgin HDPE (resin pellet)",
+    "category": "production",
+    "subCategory": "virgin",
+    "value": 1.822,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "Franklin Associates, A Division of ERG — Life Cycle Inventory of 100% Postconsumer HDPE and PET Recycled Resin from Postconsumer Containers and Packaging (rev. 2011)",
+      "url": "https://petresin.org/wp-content/uploads/2023/03/Franklin-LCI-Recycled-HDPE-and-PET-Resin-2010-rev-2011.pdf",
+      "publicationYear": 2011,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "Report Table 3-6 / summary box: virgin HDPE production burden (2010 US resin-production baseline data) = 1,822 lb CO2e per 1,000 lb of resin = 1.822 kg CO2e/kg. GWP basis: IPCC SAR 100-year factors. Cradle-to-gate through finished resin pellet.",
+    "assumptions": [
+      "US average virgin HDPE resin production, 2010 data vintage.",
+      "Excludes downstream conversion of resin to finished packaging.",
+      "Excludes materials/additives that individually total less than 1% of process inputs."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "virgin-pp-production",
+    "material": "Virgin PP (resin pellet)",
+    "category": "production",
+    "subCategory": "virgin",
+    "value": 1.7086,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 8: Raw Material Acquisition and Manufacturing (RMAM) net emissions for 100% virgin PP = 1.55 MTCO2E per short ton (process energy 1.17 + transportation energy 0.17 + process non-energy 0.21 MTCO2E/short ton). Converted to kg CO2e/kg using 1 short ton = 907.18474 kg (factor 1.102311). Underlying energy/process data sourced by EPA from RTI (2004, unpublished RTI/EPA ORD database) and Franklin Associates (2011, Cradle-to-Gate LCI of Nine Plastic Resins).",
+    "assumptions": [
+      "US average, resin form only (excludes conversion to finished packaging).",
+      "Excludes retail transportation from manufacturer to distribution point (WARM models this separately at 0.04 MTCO2E/short ton for all plastics, not included here since transport is modeled per-shipment in this engine)."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "recycled-pet-production",
+    "material": "Recycled PET (100% postconsumer, closed-loop, pellet)",
+    "category": "production",
+    "subCategory": "recycled-100pct-closed-loop",
+    "value": 1.169,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "Franklin Associates, A Division of ERG — Life Cycle Inventory of 100% Postconsumer HDPE and PET Recycled Resin from Postconsumer Containers and Packaging (rev. 2011)",
+      "url": "https://petresin.org/wp-content/uploads/2023/03/Franklin-LCI-Recycled-HDPE-and-PET-Resin-2010-rev-2011.pdf",
+      "publicationYear": 2011,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "Report Table 3-5, 'PET - Cut-off, weight-based collection', Total for PET Pellet = 1,169 lb CO2e per 1,000 lb resin = 1.169 kg CO2e/kg (IPCC SAR GWPs). 'Cut-off' allocation method: full burden for collection, sorting, and reprocessing; no virgin-production offset credited. Includes collection, sorting/separation, reclaiming to flake, and flake-to-pellet conversion.",
+    "assumptions": [
+      "'Cut-off' allocation (conservative — no credit for displacing virgin material). The same report also publishes a higher 'open-loop' allocation figure that includes a share of virgin production burden.",
+      "Weight-based collection scenario specifically; a volume-based/50%-compacted collection scenario in the same report is slightly higher.",
+      "Excludes conversion to finished packaging form."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "recycled-hdpe-production",
+    "material": "Recycled HDPE (100% postconsumer, closed-loop, pellet)",
+    "category": "production",
+    "subCategory": "recycled-100pct-closed-loop",
+    "value": 0.628,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "Franklin Associates, A Division of ERG — Life Cycle Inventory of 100% Postconsumer HDPE and PET Recycled Resin from Postconsumer Containers and Packaging (rev. 2011)",
+      "url": "https://petresin.org/wp-content/uploads/2023/03/Franklin-LCI-Recycled-HDPE-and-PET-Resin-2010-rev-2011.pdf",
+      "publicationYear": 2011,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "Report Table 3-6, 'HDPE - Cut-off, weight-based collection', Total for HDPE Pellet = 628 lb CO2e per 1,000 lb resin = 0.628 kg CO2e/kg (IPCC SAR GWPs). 'Cut-off' allocation method: full burden for collection, sorting, and reprocessing; no virgin-production offset credited.",
+    "assumptions": [
+      "'Cut-off' allocation (conservative — no credit for displacing virgin material). The same report also publishes a higher 'open-loop' allocation figure.",
+      "Weight-based collection scenario specifically.",
+      "Excludes conversion to finished packaging form."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "road-freight-hgv-average",
+    "material": "Road freight (HGV, all diesel, average laden)",
+    "category": "transport",
+    "subCategory": "road-hgv",
+    "value": 0.09752,
+    "unit": "kgCO2e/tonne.km",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "UK Government (DEFRA/DESNZ) GHG Conversion Factors for Company Reporting 2024 — Full set (flat format)",
+      "url": "https://assets.publishing.service.gov.uk/media/6722567c10b0d582ee8c4953/ghg-conversion-factors-2024-FlatFormat_v1_1.xlsx",
+      "publicationYear": 2024,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "Row ID 27_304_3140_14_1: category 'Freighting goods > HGV (all diesel) > All HGVs > Average laden', unit tonne.km, GHG/Unit 'kg CO2e', value 0.09752. 'Average laden' blends the vehicle's laden and empty-return-trip fuel efficiency across a typical duty cycle.",
+    "assumptions": [
+      "UK national average heavy-goods-vehicle diesel fleet, used here as a general-purpose road-freight proxy pending a verified US/region-specific equivalent.",
+      "Does not account for mode (e.g., rail, sea) — road HGV only."
+    ],
+    "region": "UK (used as general road-freight proxy)"
+  },
+  {
+    "id": "pet-landfill",
+    "material": "PET",
+    "category": "disposal",
+    "subCategory": "landfill",
+    "value": 0.0441,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 19: net landfilling emission factor for PET = 0.04 MTCO2E per short ton of postconsumer waste (transportation to landfill only; plastics contain no biodegradable carbon so generate no landfill CH4 and store no landfill carbon). Converted to kg CO2e/kg (factor 1.102311).",
+    "assumptions": [
+      "US average collection/transport-to-landfill distance and equipment fuel use.",
+      "Post-consumer waste-management stage only; excludes production."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "hdpe-landfill",
+    "material": "HDPE",
+    "category": "disposal",
+    "subCategory": "landfill",
+    "value": 0.0441,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 19: net landfilling emission factor for HDPE = 0.04 MTCO2E per short ton of postconsumer waste (transportation to landfill only). Converted to kg CO2e/kg (factor 1.102311).",
+    "assumptions": [
+      "US average collection/transport-to-landfill distance and equipment fuel use.",
+      "Post-consumer waste-management stage only; excludes production."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "pp-landfill",
+    "material": "PP",
+    "category": "disposal",
+    "subCategory": "landfill",
+    "value": 0.0441,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 19: net landfilling emission factor for PP = 0.04 MTCO2E per short ton of postconsumer waste (transportation to landfill only). Converted to kg CO2e/kg (factor 1.102311).",
+    "assumptions": [
+      "US average collection/transport-to-landfill distance and equipment fuel use.",
+      "Post-consumer waste-management stage only; excludes production."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "pet-combustion",
+    "material": "PET",
+    "category": "disposal",
+    "subCategory": "combustion",
+    "value": 1.3669,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 16: net combustion (waste-to-energy) emission factor for PET = 1.24 MTCO2E per short ton = CO2 from combustion (2.04, from 63% carbon content at 98% oxidation, Exhibit 17) + transport to facility (0.03) minus avoided utility grid emissions from energy recovery (-0.82, Exhibit 18). Converted to kg CO2e/kg (factor 1.102311).",
+    "assumptions": [
+      "US average combustion system efficiency (17.8%) and avoided-utility grid mix as modeled by WARM v13.",
+      "Post-consumer waste-management stage only; excludes production."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "hdpe-combustion",
+    "material": "HDPE",
+    "category": "disposal",
+    "subCategory": "combustion",
+    "value": 1.3999,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 16: net combustion emission factor for HDPE = 1.27 MTCO2E per short ton = CO2 from combustion (2.79, from 86% carbon content at 98% oxidation) + transport (0.03) minus avoided utility emissions (-1.55). Converted to kg CO2e/kg (factor 1.102311).",
+    "assumptions": [
+      "US average combustion system efficiency (17.8%) and avoided-utility grid mix as modeled by WARM v13.",
+      "Post-consumer waste-management stage only; excludes production."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "pp-combustion",
+    "material": "PP",
+    "category": "disposal",
+    "subCategory": "combustion",
+    "value": 1.8078,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 16: net combustion emission factor for PP = 1.64 MTCO2E per short ton = CO2 from combustion (3.01, from 86% carbon content at 98% oxidation) + transport (0.03) minus avoided utility emissions (-1.40). Converted to kg CO2e/kg (factor 1.102311).",
+    "assumptions": [
+      "US average combustion system efficiency (17.8%) and avoided-utility grid mix as modeled by WARM v13.",
+      "Post-consumer waste-management stage only; excludes production."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "pet-recycling-credit",
+    "material": "PET",
+    "category": "disposal",
+    "subCategory": "recycling",
+    "value": -1.2456,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 12: net emission factor for recycling (post-consumer), current-mix inputs, for PET = -1.13 MTCO2E per short ton. Represents the recycled-input credit (difference between virgin and 100%-recycled production burdens) plus materials-management collection/transport emissions. Converted to kg CO2e/kg (factor 1.102311). NEGATIVE value = net system-wide emissions reduction relative to a landfill/virgin baseline.",
+    "assumptions": [
+      "Closed-loop, resin-to-resin recycling assumption (WARM methodology).",
+      "This is a system-level avoided-burden credit, NOT a standalone material-production factor — do not interpolate against a virgin-production value the way recycled-content production factors are interpolated (methodology §6)."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "hdpe-recycling-credit",
+    "material": "HDPE",
+    "category": "disposal",
+    "subCategory": "recycling",
+    "value": -0.97,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Plastics chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Plastics.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "WARM Exhibit 12: net emission factor for recycling (post-consumer), current-mix inputs, for HDPE = -0.88 MTCO2E per short ton. Converted to kg CO2e/kg (factor 1.102311). NEGATIVE value = net system-wide emissions reduction relative to a landfill/virgin baseline.",
+    "assumptions": [
+      "Closed-loop, resin-to-resin recycling assumption (WARM methodology).",
+      "This is a system-level avoided-burden credit, NOT a standalone material-production factor — do not interpolate against a virgin-production value the way recycled-content production factors are interpolated (methodology §6)."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "commercial-dishwasher-washing-energy",
+    "material": "Commercial dishwasher washing energy (under-counter, high-temperature sanitizing)",
+    "category": "reuse-washing",
+    "subCategory": "under-counter-high-temp",
+    "value": 0.35,
+    "unit": "kWh/rack",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "ENERGY STAR Program Requirements for Commercial Dishwashers, Version 3.0 (Eligibility Criteria, Rev. September 2021)",
+      "url": "https://www.energystar.gov/sites/default/files/2024-08/Commercial%20Dishwashers%20Version%203.0%20Specification%20Rev.%20-%20September%202021.pdf",
+      "publicationYear": 2021,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "Table 2 (High Temperature Efficiency Requirements), 'Under Counter' machine type: washing energy <= 0.35 kWh/rack. This is the ENERGY STAR certification MAXIMUM threshold a qualifying machine must not exceed — an upper-bound proxy for real-world per-rack energy use, not a measured average.",
+    "assumptions": [
+      "Treats the ENERGY STAR maximum-allowed threshold as a conservative (upper-bound) estimate of actual washing energy per rack; a specific real machine's consumption may be lower.",
+      "'Under Counter' category chosen as most representative of a small cafe/restaurant's equipment.",
+      "High-temperature (thermal sanitizing) machine type assumed; a low-temperature (chemical sanitizing) machine has a lower 0.15 kWh/rack threshold per the same source (Table 1).",
+      "Combined at calculation time with a grid-electricity factor and a user-specified items-per-rack count."
+    ],
+    "region": "US"
+  },
+  {
+    "id": "us-grid-electricity-average",
+    "material": "US average grid electricity",
+    "category": "grid-electricity",
+    "value": 0.349667,
+    "unit": "kgCO2e/kWh",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA eGRID Summary Tables, 2023 data year (Revision 2, released June 2025)",
+      "url": "https://www.epa.gov/egrid/summary-data",
+      "publicationYear": 2023,
+      "accessedDate": "2026-09-05"
+    },
+    "calculationBasis": "eGRID U.S. national average total output CO2e emission rate = 770.884 lb CO2e/MWh (2023 data year, Revision 2). Converted to kg CO2e/kWh: 770.884 x 0.45359237 / 1000 = 0.349667.",
+    "assumptions": [
+      "National average — actual grid intensity varies substantially by region/utility; a specific cafe's local grid mix may differ materially.",
+      "'Total output' (generation-based) rate, not a consumption/import-adjusted rate."
+    ],
+    "region": "US (national average)"
+  }
+]
