@@ -177,7 +177,7 @@ export const useDecisionStore = create<DecisionStoreState>()(
       loadDemo: () => set({ decision: createDemoDecision() }),
     }),
     {
-      name: "ecotrace-decision-draft",
+      name: "flippoint-decision-draft",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ decision: state.decision }),
     },

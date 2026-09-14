@@ -26,7 +26,7 @@ export function MethodologyNote() {
       <div className="mx-auto mb-8 flex max-w-lg flex-col items-center gap-2 text-center">
         <h2 className="text-lg font-medium">Modeled estimates, transparently sourced</h2>
         <p className="text-sm text-muted-foreground">
-          EcoTrace produces modeled decision-support estimates, not a certified Life Cycle
+          FlipPoint produces modeled decision-support estimates, not a certified Life Cycle
           Assessment (LCA).
         </p>
       </div>

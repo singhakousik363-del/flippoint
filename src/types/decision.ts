@@ -25,7 +25,7 @@ export interface PackagingOptionDraft {
    *  meaningful for materials with a verified recycled-content factor. */
   recycledContentPct: number;
   transportFactorId: string;
-  /** Transport distance, km. Required — EcoTrace does not substitute an
+  /** Transport distance, km. Required — FlipPoint does not substitute an
    *  invented default distance. */
   transportDistanceKm: number | null;
   disposalPathway: DisposalPathway;

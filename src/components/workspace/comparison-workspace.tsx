@@ -156,7 +156,7 @@ export function ComparisonWorkspace() {
               Every environmental figure above comes from a deterministic calculation engine using
               cited emission factors — never invented or AI-generated. Figures without a
               source-stated uncertainty range are marked &ldquo;low confidence&rdquo; rather than
-              given a fabricated range. EcoTrace produces modeled decision-support estimates, not a
+              given a fabricated range. FlipPoint produces modeled decision-support estimates, not a
               certified Life Cycle Assessment (LCA).
             </p>
             <p className="mt-3">

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EcoTrace — AI Environmental Decision Copilot",
+  title: "FlipPoint — AI Environmental Decision Copilot",
   description:
     "Compare packaging options by environmental impact, uncertainty, and decision sensitivity — with transparent, source-backed calculations.",
 };

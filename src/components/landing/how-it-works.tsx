@@ -5,7 +5,7 @@ const steps = [
     icon: GitCompareIcon,
     title: "Compare your options",
     description:
-      "Enter 2–4 packaging options and EcoTrace models production, transport, and disposal impact for each — side by side.",
+      "Enter 2–4 packaging options and FlipPoint models production, transport, and disposal impact for each — side by side.",
   },
   {
     icon: ZapIcon,
@@ -31,7 +31,7 @@ export function HowItWorks() {
   return (
     <section className="mx-auto w-full max-w-5xl px-6 py-16">
       <div className="mx-auto mb-10 flex max-w-xl flex-col items-center gap-2 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">How EcoTrace works</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">How FlipPoint works</h2>
         <p className="text-muted-foreground">
           Four steps from a packaging question to a defensible, source-backed answer.
         </p>

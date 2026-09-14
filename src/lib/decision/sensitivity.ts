@@ -12,7 +12,7 @@ import type { Decision, PackagingOptionDraft } from "@/types/decision";
 import type { DisposalPathway } from "@/types/domain";
 
 /**
- * EcoTrace decision heuristic (not a statistical confidence interval): each
+ * FlipPoint decision heuristic (not a statistical confidence interval): each
  * user-set operational input (mass, distance, recycled content, reuse
  * assumptions) is probed at +/-20% of its current value to see how much it
  * could move the decision. This is a modeling choice, disclosed as such —
@@ -108,7 +108,7 @@ export interface DecisionSensitivityResult {
 }
 
 const HEURISTIC_NOTE =
-  `+/-${SENSITIVITY_VARIATION_PCT}% EcoTrace sensitivity heuristic — an illustrative ` +
+  `+/-${SENSITIVITY_VARIATION_PCT}% FlipPoint sensitivity heuristic — an illustrative ` +
   "probe around your input, not a source-stated uncertainty range.";
 
 function centralImpactOf(option: PackagingOptionDraft): number {
@@ -129,7 +129,7 @@ function winnerAt(diff: number, bestId: string, runnerUpId: string): string {
 /**
  * Fits an exact affine model f(x) = slope*x + intercept from two probes of a
  * function known (from the engine's formulas) to be linear in x — mass,
- * distance, and recycled-content fraction are all affine in EcoTrace's
+ * distance, and recycled-content fraction are all affine in FlipPoint's
  * production/transport/disposal formulas. Solves slope*x + intercept = target.
  */
 function solveLinear(

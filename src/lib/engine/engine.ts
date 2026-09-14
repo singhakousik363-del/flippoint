@@ -8,7 +8,7 @@ import type {
 } from "@/types/domain";
 
 /**
- * EcoTrace decision heuristic (not a scientific constant): a relative
+ * FlipPoint decision heuristic (not a scientific constant): a relative
  * central-estimate gap below this threshold is treated as not reliably
  * distinguishable from ordinary source-to-source dataset variance, because
  * published packaging emission factors commonly carry their own +/-15-25%

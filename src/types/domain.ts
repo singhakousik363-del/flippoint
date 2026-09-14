@@ -1,5 +1,5 @@
 /**
- * Core domain types for the EcoTrace calculation engine.
+ * Core domain types for the FlipPoint calculation engine.
  * Canonical internal units: mass = kg, distance = km, energy = kWh, emissions = kgCO2e.
  */
 

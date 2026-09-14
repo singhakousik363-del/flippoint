@@ -13,7 +13,7 @@ export default function Home() {
       <MethodologyNote />
       <DemoCtaBand />
       <footer className="mx-auto w-full max-w-4xl px-6 py-8 text-center text-xs text-muted-foreground">
-        EcoTrace — built for NextStep Hacks 2026.
+        FlipPoint — built for NextStep Hacks 2026.
       </footer>
     </div>
   );

@@ -45,7 +45,7 @@ export function Hero() {
         transition={{ duration: 0.5, delay: 0.1 }}
         className="max-w-xl text-lg text-muted-foreground text-balance"
       >
-        EcoTrace compares environmental trade-offs with transparent, source-backed calculations —
+        FlipPoint compares environmental trade-offs with transparent, source-backed calculations —
         and shows exactly when your recommendation changes.
       </motion.p>
 

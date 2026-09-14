@@ -15,7 +15,7 @@ export function DecisionFlipPreview() {
           See the moment your decision flips
         </h2>
         <p className="text-muted-foreground">
-          When a real assumption crosses its modeled threshold, EcoTrace shows exactly what
+          When a real assumption crosses its modeled threshold, FlipPoint shows exactly what
           changed, why, and what the new recommendation is — using the numbers already in your
           comparison, never invented ones.
         </p>
