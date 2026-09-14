@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { OptionCard } from "@/components/decision/option-card";
 import { useDecisionStore } from "@/store/decision-store";
 
-export function OptionList({ errors }: { errors: Record<string, string> }) {
+export function OptionList({
+  errors,
+  onFieldBlur,
+}: {
+  errors: Record<string, string>;
+  onFieldBlur: (key: string) => void;
+}) {
   const options = useDecisionStore((s) => s.decision.options);
   const addOption = useDecisionStore((s) => s.addOption);
 
@@ -31,6 +37,7 @@ export function OptionList({ errors }: { errors: Record<string, string> }) {
             index={index}
             canRemove={options.length > 2}
             errors={errors}
+            onFieldBlur={onFieldBlur}
           />
         ))}
       </div>

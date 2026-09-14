@@ -6,7 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/decision/field";
 import { useDecisionStore } from "@/store/decision-store";
 
-export function DecisionForm({ errors }: { errors: Record<string, string> }) {
+export function DecisionForm({
+  errors,
+  onFieldBlur,
+}: {
+  errors: Record<string, string>;
+  onFieldBlur: (key: string) => void;
+}) {
   const decision = useDecisionStore((s) => s.decision);
   const setName = useDecisionStore((s) => s.setName);
   const setBusinessContext = useDecisionStore((s) => s.setBusinessContext);
@@ -25,6 +31,7 @@ export function DecisionForm({ errors }: { errors: Record<string, string> }) {
             placeholder="e.g. Cold cup packaging for 2026"
             value={decision.name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={() => onFieldBlur("name")}
           />
         </Field>
 
@@ -55,6 +62,7 @@ export function DecisionForm({ errors }: { errors: Record<string, string> }) {
             inputMode="numeric"
             value={decision.annualVolume || ""}
             onChange={(e) => setAnnualVolume(e.target.valueAsNumber || 0)}
+            onBlur={() => onFieldBlur("annualVolume")}
           />
         </Field>
       </CardContent>

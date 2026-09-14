@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +14,11 @@ export default function DecisionBuilderPage() {
   const hydrated = useDecisionStoreHydrated();
   const decision = useDecisionStore((s) => s.decision);
   const loadDemo = useDecisionStore((s) => s.loadDemo);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  function markTouched(key: string) {
+    setTouched((prev) => (prev[key] ? prev : { ...prev, [key]: true }));
+  }
 
   if (!hydrated) {
     return (
@@ -25,6 +31,14 @@ export default function DecisionBuilderPage() {
   }
 
   const { valid, errors } = validateDecision(decision);
+  // Only surface a field's error after it's been touched (blurred) — an
+  // untouched field never shows red on first load, even if it's currently
+  // invalid. `valid`/`errors` above stay the full, untouched-inclusive
+  // result, so the Calculate button and helper line are unaffected.
+  const visibleErrors: Record<string, string> = {};
+  for (const key of Object.keys(errors)) {
+    if (touched[key]) visibleErrors[key] = errors[key];
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-16 pb-32">
@@ -40,8 +54,8 @@ export default function DecisionBuilderPage() {
         </Button>
       </div>
 
-      <DecisionForm errors={errors} />
-      <OptionList errors={errors} />
+      <DecisionForm errors={visibleErrors} onFieldBlur={markTouched} />
+      <OptionList errors={visibleErrors} onFieldBlur={markTouched} />
 
       <div className="fixed inset-x-0 bottom-0 border-t border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-between gap-3 px-6 py-4">

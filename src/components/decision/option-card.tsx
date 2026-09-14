@@ -28,11 +28,13 @@ export function OptionCard({
   index,
   canRemove,
   errors,
+  onFieldBlur,
 }: {
   option: PackagingOptionDraft;
   index: number;
   canRemove: boolean;
   errors: Record<string, string>;
+  onFieldBlur: (key: string) => void;
 }) {
   const updateOption = useDecisionStore((s) => s.updateOption);
   const setReusable = useDecisionStore((s) => s.setReusable);
@@ -63,6 +65,7 @@ export function OptionCard({
               id={`${prefix}.name`}
               value={option.name}
               onChange={(e) => updateOption(option.id, { name: e.target.value })}
+              onBlur={() => onFieldBlur(`${prefix}.name`)}
             />
           </Field>
         </div>
@@ -122,6 +125,7 @@ export function OptionCard({
               step="0.1"
               value={option.massGrams || ""}
               onChange={(e) => updateOption(option.id, { massGrams: e.target.valueAsNumber || 0 })}
+              onBlur={() => onFieldBlur(`${prefix}.massGrams`)}
             />
           </Field>
 
@@ -141,6 +145,7 @@ export function OptionCard({
               onChange={(e) =>
                 updateOption(option.id, { recycledContentPct: e.target.valueAsNumber || 0 })
               }
+              onBlur={() => onFieldBlur(`${prefix}.recycledContentPct`)}
             />
           </Field>
         </div>
@@ -164,6 +169,7 @@ export function OptionCard({
                     : e.target.valueAsNumber,
                 })
               }
+              onBlur={() => onFieldBlur(`${prefix}.transportDistanceKm`)}
             />
           </Field>
 
@@ -251,6 +257,7 @@ export function OptionCard({
                       },
                     })
                   }
+                  onBlur={() => onFieldBlur(`${prefix}.reusableSettings.maxCycles`)}
                 />
               </Field>
 
@@ -274,6 +281,7 @@ export function OptionCard({
                       },
                     })
                   }
+                  onBlur={() => onFieldBlur(`${prefix}.reusableSettings.lossRatePct`)}
                 />
               </Field>
 
@@ -295,6 +303,7 @@ export function OptionCard({
                       },
                     })
                   }
+                  onBlur={() => onFieldBlur(`${prefix}.reusableSettings.itemsPerWash`)}
                 />
               </Field>
 
