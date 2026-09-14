@@ -10,12 +10,15 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { ExcludedMaterialItem } from "@/components/decision/excluded-material-item";
 import { Field } from "@/components/decision/field";
 import { getDisposalOptionsFor, MATERIAL_CATALOG, TRANSPORT_CATALOG } from "@/lib/data/catalog";
+import { PENDING_FACTORS } from "@/lib/data/pending-factors";
 import { useDecisionStore } from "@/store/decision-store";
 import type { DisposalPathway } from "@/types/domain";
 import type { MaterialCode, PackagingOptionDraft } from "@/types/decision";
@@ -79,7 +82,9 @@ export function OptionCard({
         <Field label="Material" htmlFor={`${prefix}.material`}>
           <Select
             value={option.materialCode}
-            onValueChange={(value) => value && handleMaterialChange(value)}
+            onValueChange={(value) =>
+              value && MATERIAL_CATALOG.some((m) => m.code === value) && handleMaterialChange(value)
+            }
           >
             <SelectTrigger id={`${prefix}.material`} className="w-full">
               <SelectValue>
@@ -92,6 +97,14 @@ export function OptionCard({
                   {m.label}
                 </SelectItem>
               ))}
+              {PENDING_FACTORS.length > 0 && (
+                <>
+                  <SelectSeparator />
+                  {PENDING_FACTORS.map((factor) => (
+                    <ExcludedMaterialItem key={factor.id} factor={factor} />
+                  ))}
+                </>
+              )}
             </SelectContent>
           </Select>
         </Field>

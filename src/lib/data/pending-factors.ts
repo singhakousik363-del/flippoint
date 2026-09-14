@@ -8,6 +8,8 @@ export interface PendingFactor {
   id: string;
   material: string;
   category: string;
+  /** One-line summary shown in UI before the entry is expanded to the full reason text. */
+  summary: string;
   reason: string;
   candidateSources: { name: string; url: string; note: string }[];
 }
@@ -17,6 +19,8 @@ export const PENDING_FACTORS: PendingFactor[] = [
     id: "virgin-pla-production",
     material: "Virgin PLA (polylactic acid) resin",
     category: "production",
+    summary:
+      "Published cradle-to-gate GHG figures for PLA disagree by roughly 5x across sources — no defensible single value yet.",
     reason:
       "Published cradle-to-gate GHG figures for PLA disagree by roughly 5x depending on source " +
       "(NatureWorks' own Ingeo LCA reports approx. 0.62 kgCO2e/kg; independent literature reviews " +
@@ -42,6 +46,8 @@ export const PENDING_FACTORS: PendingFactor[] = [
     id: "recycled-pp-production",
     material: "Recycled PP (polypropylene)",
     category: "production",
+    summary:
+      "No independent recycled-PP production factor found from a comparably authoritative public source.",
     reason:
       "EPA WARM v13 explicitly states the recycling pathway is only modeled for HDPE and PET " +
       "'due to LCI data limitations' and that life-cycle inventory data for other recycled " +
@@ -60,6 +66,8 @@ export const PENDING_FACTORS: PendingFactor[] = [
     id: "pp-recycling-credit",
     material: "PP",
     category: "disposal (recycling pathway)",
+    summary:
+      "No sourced recycling end-of-life factor exists for PP — only landfill and combustion are modeled.",
     reason:
       "Same LCI data limitation as recycled-PP production above: WARM does not model a recycling " +
       "end-of-life pathway for PP, so no sourced 'recycling' disposal factor exists for it. " +
