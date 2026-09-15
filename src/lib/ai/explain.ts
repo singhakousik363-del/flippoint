@@ -1,11 +1,30 @@
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
-import { getAnthropicClient } from "@/lib/ai/client";
+import type { z } from "zod";
+import { getAnthropicClient, getGeminiApiKey } from "@/lib/ai/client";
 import {
   aiExplainRequestSchema,
   aiExplainResponseSchema,
   type AiExplainRequest,
   type AiExplainResponse,
 } from "@/lib/ai/schema";
+
+const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+/** OpenAPI-subset schema Gemini uses for structured output — mirrors
+ *  aiExplainResponseSchema so the model can only emit the same shape the
+ *  Anthropic path produces via zodOutputFormat. */
+const GEMINI_RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    headline: { type: "STRING" },
+    summary: { type: "STRING" },
+    keyReasons: { type: "ARRAY", items: { type: "STRING" } },
+    caution: { type: "STRING" },
+    action: { type: "STRING" },
+  },
+  required: ["headline", "summary", "keyReasons"],
+} as const;
 
 const SYSTEM_PROMPT = `You are an environmental decision explanation assistant.
 You do not perform calculations.
@@ -21,7 +40,15 @@ Rules:
 - The confidence tier and the recommended (best) option are fixed by the data — never override, second-guess, or contradict them.
 - If a field (break-even, scenario, sensitivity) is absent from the data, do not speculate about it or claim it doesn't matter.
 - This is a modeled estimate, not a certified Life Cycle Assessment — keep the tone measured and factual, never authoritative-sounding beyond what the data supports.
-- Return each key reason as its own array item, without your own numbering or bullet characters.`;
+- Return each key reason as its own array item, without your own numbering or bullet characters.
+
+Hard length requirements — every response MUST satisfy all of these, with no exceptions:
+- "headline": at most 140 characters.
+- "summary": at most 600 characters.
+- "keyReasons": 1 to 5 items, each item at most 200 characters.
+- "caution" (if included): at most 400 characters.
+- "action" (if included): at most 200 characters.
+Count characters before responding. If a sentence would exceed a limit, shorten it rather than omit required content.`;
 
 export interface ExplainResult {
   source: "ai" | "fallback";
@@ -179,25 +206,40 @@ export function buildFallback(input: AiExplainRequest): AiExplainResponse {
   };
 }
 
-/**
- * Validates the request, calls Claude for a natural-language explanation of
- * already-computed results, verifies no number in the response was
- * fabricated, and always returns a safe, schema-valid result — falling back
- * to a deterministic template (never a broken UI) on any failure.
- */
-export async function generateDecisionBrief(
-  rawInput: unknown,
-): Promise<{ ok: true; result: ExplainResult } | { ok: false; error: string }> {
-  const parsed = aiExplainRequestSchema.safeParse(rawInput);
-  if (!parsed.success) {
-    return { ok: false, error: `Invalid request payload: ${parsed.error.message}` };
-  }
-  const input = parsed.data;
-  const fallback = buildFallback(input);
+type BriefOutcome = { ok: true; result: ExplainResult };
 
+/** Runs the fabrication check shared by every provider and folds the result
+ *  into the same ExplainResult shape the fallback template uses. */
+function toOutcome(parsedOutput: AiExplainResponse, input: AiExplainRequest, fallback: AiExplainResponse): BriefOutcome {
+  const allowed = collectAllowedNumbers(input);
+  const check = verifyNoFabricatedNumbers(parsedOutput, allowed);
+  if (!check.ok) {
+    return {
+      ok: true,
+      result: {
+        source: "fallback",
+        data: fallback,
+        reason: `AI response referenced unverified numbers: ${check.badNumbers.join(", ")}`,
+      },
+    };
+  }
+  return { ok: true, result: { source: "ai", data: parsedOutput } };
+}
+
+/** Thrown when the Anthropic API call itself fails (network error, non-2xx,
+ *  etc.) — distinct from a successful call that refuses, returns nothing
+ *  usable, or cites fabricated numbers, which resolve to a fallback outcome
+ *  directly without involving Gemini. Lets the caller try Gemini next. */
+class AnthropicRuntimeError extends Error {}
+
+async function callAnthropic(
+  client: ReturnType<typeof getAnthropicClient>,
+  input: AiExplainRequest,
+  fallback: AiExplainResponse,
+): Promise<BriefOutcome> {
+  let message: Awaited<ReturnType<typeof client.messages.parse>>;
   try {
-    const client = getAnthropicClient();
-    const message = await client.messages.parse({
+    message = await client.messages.parse({
       model: "claude-opus-5",
       max_tokens: 1024,
       // Formatting already-computed data into prose doesn't need deep reasoning;
@@ -209,34 +251,182 @@ export async function generateDecisionBrief(
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: buildUserPrompt(input) }],
     });
-
-    if (message.stop_reason === "refusal") {
-      return { ok: true, result: { source: "fallback", data: fallback, reason: "AI declined to respond." } };
-    }
-
-    const parsedOutput = message.parsed_output;
-    if (!parsedOutput) {
-      return { ok: true, result: { source: "fallback", data: fallback, reason: "AI response was empty or malformed." } };
-    }
-
-    const allowed = collectAllowedNumbers(input);
-    const check = verifyNoFabricatedNumbers(parsedOutput, allowed);
-    if (!check.ok) {
-      return {
-        ok: true,
-        result: {
-          source: "fallback",
-          data: fallback,
-          reason: `AI response referenced unverified numbers: ${check.badNumbers.join(", ")}`,
-        },
-      };
-    }
-
-    return { ok: true, result: { source: "ai", data: parsedOutput } };
   } catch (e) {
     // Log the real cause server-side only — never surface raw SDK/error text
     // (which can include request internals) to the client.
-    console.error("[ai/explain] AI call failed, using fallback:", e);
+    console.error("[ai/explain] Anthropic call failed:", e);
+    throw new AnthropicRuntimeError("Anthropic call failed");
+  }
+
+  if (message.stop_reason === "refusal") {
+    return { ok: true, result: { source: "fallback", data: fallback, reason: "AI declined to respond." } };
+  }
+
+  const parsedOutput = message.parsed_output;
+  if (!parsedOutput) {
+    return { ok: true, result: { source: "fallback", data: fallback, reason: "AI response was empty or malformed." } };
+  }
+
+  return toOutcome(parsedOutput, input, fallback);
+}
+
+interface GeminiCandidate {
+  content?: { parts?: { text?: string }[] };
+  finishReason?: string;
+}
+interface GeminiResponseBody {
+  candidates?: GeminiCandidate[];
+  promptFeedback?: { blockReason?: string };
+}
+
+type GeminiAttempt =
+  | { kind: "refusal" }
+  | { kind: "malformed" }
+  | { kind: "success"; data: unknown };
+
+async function requestGeminiCompletion(apiKey: string, promptText: string): Promise<GeminiAttempt> {
+  const res = await fetch(GEMINI_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: [{ role: "user", parts: [{ text: promptText }] }],
+      generationConfig: {
+        maxOutputTokens: 1024,
+        responseMimeType: "application/json",
+        responseSchema: GEMINI_RESPONSE_SCHEMA,
+        // 2.5 models think by default, and thinking tokens count against
+        // maxOutputTokens — without this, the budget above can be consumed
+        // entirely by thinking, leaving no room for the actual JSON output.
+        thinkingConfig: { thinkingBudget: 0 },
+      },
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Gemini API responded with status ${res.status}`);
+  }
+
+  const body = (await res.json()) as GeminiResponseBody;
+
+  if (body.promptFeedback?.blockReason) {
+    return { kind: "refusal" };
+  }
+
+  const candidate = body.candidates?.[0];
+  if (candidate?.finishReason === "SAFETY" || candidate?.finishReason === "RECITATION") {
+    return { kind: "refusal" };
+  }
+
+  const text = candidate?.content?.parts?.[0]?.text;
+  if (!text) {
+    return { kind: "malformed" };
+  }
+
+  try {
+    return { kind: "success", data: JSON.parse(text) };
+  } catch {
+    return { kind: "malformed" };
+  }
+}
+
+/** Turns zod's "too_big" issues for the response schema's length-limited
+ *  fields into a short note we can append to a retry prompt, naming exactly
+ *  which field(s) exceeded which limit. */
+function describeLengthViolations(issues: z.ZodIssue[]): string | undefined {
+  const notes = issues
+    .filter((issue) => issue.code === "too_big")
+    .map((issue) => `"${issue.path.join(".")}" must be at most ${issue.maximum} characters`);
+  if (!notes.length) return undefined;
+  return `Your previous response violated the required length limits: ${notes.join("; ")}. Rewrite the response, keeping every field within its stated limit.`;
+}
+
+async function callGemini(apiKey: string, input: AiExplainRequest, fallback: AiExplainResponse): Promise<BriefOutcome> {
+  const refusalOutcome: BriefOutcome = { ok: true, result: { source: "fallback", data: fallback, reason: "AI declined to respond." } };
+  const malformedOutcome: BriefOutcome = {
+    ok: true,
+    result: { source: "fallback", data: fallback, reason: "AI response was empty or malformed." },
+  };
+
+  try {
+    const basePrompt = buildUserPrompt(input);
+    const attempt = await requestGeminiCompletion(apiKey, basePrompt);
+    if (attempt.kind === "refusal") return refusalOutcome;
+    if (attempt.kind === "malformed") return malformedOutcome;
+
+    let parsed = aiExplainResponseSchema.safeParse(attempt.data);
+    if (!parsed.success) {
+      const retryNote = describeLengthViolations(parsed.error.issues);
+      const retryAttempt = await requestGeminiCompletion(apiKey, retryNote ? `${basePrompt}\n\n${retryNote}` : basePrompt);
+      if (retryAttempt.kind === "refusal") return refusalOutcome;
+      if (retryAttempt.kind === "malformed") return malformedOutcome;
+      parsed = aiExplainResponseSchema.safeParse(retryAttempt.data);
+      if (!parsed.success) return malformedOutcome;
+    }
+
+    return toOutcome(parsed.data, input, fallback);
+  } catch (e) {
+    // Log the real cause server-side only — never surface raw SDK/error text
+    // (which can include request internals) to the client.
+    console.error("[ai/explain] Gemini call failed, using fallback:", e);
     return { ok: true, result: { source: "fallback", data: fallback, reason: "AI service unavailable." } };
+  }
+}
+
+/** Tries Gemini (when GEMINI_API_KEY is configured) and otherwise resolves to
+ *  the deterministic fallback — the shared tail of both routes into Gemini:
+ *  Anthropic not configured, and Anthropic configured but failing at runtime. */
+async function tryGeminiOrFallback(input: AiExplainRequest, fallback: AiExplainResponse): Promise<BriefOutcome> {
+  try {
+    const apiKey = getGeminiApiKey();
+    return await callGemini(apiKey, input, fallback);
+  } catch {
+    // GEMINI_API_KEY not configured, or the Gemini call itself failed above
+    // (callGemini already resolves its own runtime failures to a fallback
+    // outcome, so reaching here only happens when the key lookup throws).
+    return { ok: true, result: { source: "fallback", data: fallback, reason: "AI service unavailable." } };
+  }
+}
+
+/**
+ * Validates the request, calls an AI provider for a natural-language
+ * explanation of already-computed results, verifies no number in the
+ * response was fabricated, and always returns a safe, schema-valid result —
+ * falling back to a deterministic template (never a broken UI) on any
+ * failure.
+ *
+ * Provider selection: Anthropic when ANTHROPIC_API_KEY is configured. If
+ * Anthropic isn't configured, or if it is configured but the call fails at
+ * runtime (network error, non-2xx, etc.), Gemini is tried next when
+ * GEMINI_API_KEY is configured. A successful Anthropic call that refuses,
+ * returns nothing usable, or cites fabricated numbers resolves straight to
+ * the deterministic fallback without involving Gemini — only a genuine
+ * runtime failure warrants trying another provider. If Gemini also fails
+ * (or isn't configured), the deterministic fallback is used.
+ */
+export async function generateDecisionBrief(
+  rawInput: unknown,
+): Promise<{ ok: true; result: ExplainResult } | { ok: false; error: string }> {
+  const parsed = aiExplainRequestSchema.safeParse(rawInput);
+  if (!parsed.success) {
+    return { ok: false, error: `Invalid request payload: ${parsed.error.message}` };
+  }
+  const input = parsed.data;
+  const fallback = buildFallback(input);
+
+  let client: ReturnType<typeof getAnthropicClient>;
+  try {
+    client = getAnthropicClient();
+  } catch {
+    // ANTHROPIC_API_KEY not configured — fall through to Gemini.
+    return tryGeminiOrFallback(input, fallback);
+  }
+
+  try {
+    return await callAnthropic(client, input, fallback);
+  } catch {
+    // Anthropic call failed at runtime — fall through to Gemini.
+    return tryGeminiOrFallback(input, fallback);
   }
 }
