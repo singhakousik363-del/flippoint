@@ -92,7 +92,7 @@ Knowing which numbers can't be used responsibly is part of the tool's job.
 | UI | Tailwind CSS, shadcn/base-ui components, Framer Motion, Recharts |
 | State | Zustand (persisted decision store) |
 | Validation | Zod |
-| AI explanation layer | Anthropic SDK (Claude), Gemini 2.5 Flash (REST) — see below |
+| AI explanation layer | Gemini 2.5 Flash (primary, REST), Anthropic SDK (optional) — see below |
 | Testing | Vitest, Testing Library |
 | Deployment | Vercel |
 
@@ -161,7 +161,7 @@ pair-programmer throughout.
 
 ## Author
 
-**Kousik Singha**
+**singhakousik363-del**
 
 ## License
 
