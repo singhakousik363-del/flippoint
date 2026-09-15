@@ -1,252 +1,168 @@
-# MAPA — Multi-Agent Productivity Assistant
+# FlipPoint
 
-> **Build in APAC. Build for the world.**
-> A multi-agent AI productivity system built for the **Google Cloud Gen AI Academy APAC Hackathon 2026**.
+> An environmental decision copilot built for **NextStep Hacks 2026**.
 
-[![Live API](https://img.shields.io/badge/API-Live-brightgreen)](https://mapa-api-637668641799.asia-south1.run.app/docs)
-[![Frontend](https://img.shields.io/badge/Frontend-Live-blue)](https://gen-lang-client-0349644995.web.app)
-[![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Run-orange)](https://cloud.google.com/run)
-[![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-purple)](https://ai.google.dev)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-brightgreen)](https://flippoint-ivory.vercel.app/)
+[![Tests](https://github.com/singhakousik363-del/flippoint/actions/workflows/test.yml/badge.svg)](https://github.com/singhakousik363-del/flippoint/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-**🔗 Live Demo:** https://gen-lang-client-0349644995.web.app
-**🔗 API Docs:** https://mapa-api-637668641799.asia-south1.run.app/docs
+**🔗 Live Demo:** https://flippoint-ivory.vercel.app/
 
----
-
-## 🎯 The Problem We're Solving
-
-**APAC's productivity tool gap.** Across India and Southeast Asia, millions of students, professionals, and small business owners *think* in their native language — Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati — but are forced to *operate* productivity tools in English. This friction costs time, creates errors, and excludes the non-English-speaking majority from digital productivity.
-
-**MAPA is a voice-first, multilingual, multi-agent assistant** that lets users manage their entire day — tasks, calendar events, and notes — by simply speaking or typing in their own language.
-
-> *"আমাকে কাল বিকেলে dentist-এর কাছে যেতে হবে, আর সন্ধ্যায় groceries কেনার reminder দাও"*
-> → MAPA parses this, creates a calendar event + a task, and stores them in Firestore. Instantly.
+![FlipPoint detecting a decision flip](docs/decision-flip.png)
 
 ---
 
-## ✅ Problem Statement Alignment
+## What FlipPoint does
 
-This project directly addresses every requirement in the Google Cloud Gen AI Academy APAC hackathon problem statement:
+Choosing between packaging options (virgin plastic vs. recycled content, single-use vs.
+reusable, one supplier's freight lane vs. another) usually comes down to a gut call, because
+running the numbers by hand is tedious and the "right" answer is often close enough to flip
+under slightly different assumptions.
 
-> *"Build a multi-agent AI system that helps users manage tasks, schedules, and information by interacting with multiple tools and data sources."*
+**FlipPoint compares 2–4 packaging options through a deterministic, source-cited calculation
+engine and tells you exactly which assumption would have to change to flip the recommendation** —
+instead of just handing you a single number and hoping you trust it.
 
-| Requirement | How MAPA delivers |
-|---|---|
-| **Primary agent coordinating sub-agents** | `MAPAOrchestrator` (Gemini 2.5 Flash) coordinates three specialized sub-agents: Task, Calendar, Notes |
-| **Store/retrieve structured data from a DB** | Firebase Firestore with three collections: `tasks`, `events`, `notes` — full CRUD via agent tools |
-| **Integrate multiple tools via MCP** | MCP-style tool abstraction: `TaskMCPTool`, `CalendarMCPTool`, `NotesMCPTool` — all extending a common base |
-| **Handle multi-step workflows** | Single user message → LLM intent extraction → multiple parallel tool calls → synthesized response |
-| **Deploy as an API-based system** | FastAPI on Google Cloud Run (`asia-south1`), documented via OpenAPI/Swagger UI |
+- **Deterministic engine** — production, transport, and disposal impact are computed the same
+  way every time, from a small library of cited emission factors. No randomness, no guessing.
+- **Sensitivity analysis & break-even** — ranks every input assumption by how much it could move
+  the outcome, and solves for the exact break-even point where the recommended option changes.
+- **What-if simulator** — drag a slider (volume, transport distance, recycled content, …) and
+  watch the recommendation update live, driven by the same engine.
+- **AI explains, never calculates** — a language model narrates the deterministic result in
+  plain English. It is not permitted to compute, invent, or override a number: every response is
+  checked against the exact figures it was given, and anything containing a number it wasn't
+  handed is discarded in favor of a deterministic template. See [Running locally](#running-locally).
 
----
+FlipPoint produces modeled decision-support estimates, not a certified Life Cycle Assessment (LCA).
 
-## 🏗️ Architecture
+## How it works
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USER                                     │
-│  (Voice + Text in 8 Indian languages: EN, HI, BN, TA, TE, MR,   │
-│                    GU, PA — plus Web Speech API)                │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              FRONTEND (React + Vite + Firebase Hosting)          │
-│  • Chat interface  • Voice input  • Tasks/Calendar/Notes panels │
-│  • Browser notifications  • Real-time agent badges              │
-└────────────────────────────┬────────────────────────────────────┘
-                             │  HTTPS
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│           BACKEND API (FastAPI on Cloud Run asia-south1)         │
-│                                                                   │
-│   ┌─────────────────────────────────────────────────────┐       │
-│   │          PRIMARY AGENT: MAPAOrchestrator             │       │
-│   │          (Gemini 2.5 Flash — intent extraction)      │       │
-│   └──┬──────────────┬──────────────┬─────────────────────┘       │
-│      │              │              │                              │
-│      ▼              ▼              ▼                              │
-│  ┌────────┐    ┌────────┐    ┌────────┐                          │
-│  │ Task   │    │Calendar│    │ Notes  │   ← MCP-style Sub-agents │
-│  │ Agent  │    │ Agent  │    │ Agent  │                          │
-│  └───┬────┘    └───┬────┘    └───┬────┘                          │
-│      │             │             │                                │
-└──────┼─────────────┼─────────────┼────────────────────────────────┘
-       │             │             │
-       ▼             ▼             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  DATA LAYER: Firebase Firestore                  │
-│   ┌──────────┐   ┌──────────┐   ┌──────────┐                    │
-│   │  tasks   │   │  events  │   │  notes   │                    │
-│   └──────────┘   └──────────┘   └──────────┘                    │
-└─────────────────────────────────────────────────────────────────┘
-```
+1. **Compare your options** — enter 2–4 packaging options; FlipPoint models production,
+   transport, and disposal impact for each, side by side.
+2. **See what would change your decision** — sensitivity analysis ranks every assumption by how
+   much it could move the outcome, and finds the exact break-even point.
+3. **Simulate a what-if scenario** — drag a slider and watch the recommendation update instantly.
+4. **Get a plain-language explanation** — an AI layer explains the deterministic result; only the
+   engine ever computes a number.
 
----
+## Emission factors
 
-## 🚀 Key Innovations
+Every calculation traces back to one of the cited factors below
+(`src/lib/data/emission-factors.json`). Negative values are **avoided emissions** (a net
+system-wide reduction relative to a landfill/virgin baseline), not emissions produced.
 
-### 1. **Voice-first, multilingual input for APAC users**
-- 8 Indian languages supported out of the box: English, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Punjabi
-- Web Speech API integration — users **speak** to the assistant
-- Gemini handles mixed-language input (code-switching) naturally
+| Material | Category | Value | Unit | Source | Year |
+|---|---|---|---|---|---|
+| Virgin PET (bottle-grade resin pellet) | production (virgin) | 2.746 | kgCO2e/kg | Franklin Associates (ERG) | 2011 |
+| Virgin HDPE (resin pellet) | production (virgin) | 1.822 | kgCO2e/kg | Franklin Associates (ERG) | 2011 |
+| Virgin PP (resin pellet) | production (virgin) | 1.7086 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| Recycled PET (100% postconsumer, closed-loop, pellet) | production (recycled-100pct-closed-loop) | 1.169 | kgCO2e/kg | Franklin Associates (ERG) | 2011 |
+| Recycled HDPE (100% postconsumer, closed-loop, pellet) | production (recycled-100pct-closed-loop) | 0.628 | kgCO2e/kg | Franklin Associates (ERG) | 2011 |
+| Road freight (HGV, all diesel, average laden) | transport (road-hgv) | 0.09752 | kgCO2e/tonne.km | UK Government (DEFRA/DESNZ) | 2024 |
+| PET | disposal (landfill) | 0.0441 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| HDPE | disposal (landfill) | 0.0441 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| PP | disposal (landfill) | 0.0441 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| PET | disposal (combustion) | 1.3669 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| HDPE | disposal (combustion) | 1.3999 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| PP | disposal (combustion) | 1.8078 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| PET | disposal (recycling) | -1.2456 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| HDPE | disposal (recycling) | -0.97 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| Commercial dishwasher washing energy (under-counter, high-temp sanitizing) | reuse-washing (under-counter-high-temp) | 0.35 | kWh/rack | ENERGY STAR (US EPA) | 2021 |
+| US average grid electricity | grid-electricity | 0.349667 | kgCO2e/kWh | US EPA (eGRID) | 2023 |
 
-### 2. **Single-shot multi-intent extraction**
-- One message from the user → Gemini extracts **all** intended actions at once
-- Example: *"Remind me to call mom tomorrow, book a meeting with the team on Friday 3 PM, and save a note about Q2 goals"*
-- → Creates 1 task + 1 event + 1 note in a single coordinated run
+### Documented gaps
 
-### 3. **MCP-style extensible tool architecture**
-- Every sub-agent implements a common `MCPTool` contract: `name`, `description`, `call(params)`, `ToolResult`
-- Adding a new agent (e.g., Email, Reminder, Analytics) takes ~50 lines of code
-- Tools are registered in an `MCPRegistry` discoverable via `GET /tools`
+Some factors were researched and deliberately not included. PLA is the clearest case: published
+cradle-to-gate figures disagree by roughly 5×, and the low industry-reported value depends on
+renewable-mix and biogenic-carbon assumptions that aren't disclosed consistently across studies.
+Rather than pick a number, the gap is documented in
+[src/lib/data/pending-factors.ts](src/lib/data/pending-factors.ts) with its candidate sources and
+the reason it remains unresolved, and the engine rejects any calculation requiring an unverified
+factor. The same rule applied elsewhere — recycled PP is excluded because EPA WARM v13 states its
+recycling pathway is only modeled for HDPE and PET due to LCI data limitations.
 
-### 4. **Real-time conversation memory**
-- Session-scoped conversation history (last 20 turns)
-- Gemini uses this context to resolve references ("the meeting tomorrow" → the event just created)
+Knowing which numbers can't be used responsibly is part of the tool's job.
 
-### 5. **Production-grade deployment**
-- Containerized via Docker → Google Cloud Run (asia-south1, low latency for APAC users)
-- Firebase Hosting for frontend → CDN-backed global delivery
-- Firebase Admin SDK for Firestore — fully serverless, auto-scaling
-
----
-
-## 🛠️ Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |---|---|
-| **LLM** | Gemini 2.5 Flash (Google AI Studio) |
-| **Agent Framework** | Custom MCP-style orchestrator (inspired by Google ADK) |
-| **Backend** | Python 3.11, FastAPI, Uvicorn |
-| **Database** | Firebase Firestore |
-| **Frontend** | React 18, Vite, Firebase Hosting |
-| **Voice** | Web Speech API (browser-native) |
-| **Deployment** | Google Cloud Run (asia-south1), Cloud Build, Docker |
-| **Auth / Admin** | Firebase Admin SDK |
+| Framework | Next.js 16 (App Router), React 19, TypeScript |
+| UI | Tailwind CSS, shadcn/base-ui components, Framer Motion, Recharts |
+| State | Zustand (persisted decision store) |
+| Validation | Zod |
+| AI explanation layer | Anthropic SDK (Claude), Gemini 2.5 Flash (REST) — see below |
+| Testing | Vitest, Testing Library |
+| Deployment | Vercel |
 
----
+## Running locally
 
-## 📊 API Endpoints
-
-All endpoints are live at `https://mapa-api-637668641799.asia-south1.run.app`
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/health` | GET | Service health check |
-| `/tools` | GET | List all registered MCP tools |
-| `/chat` | POST | Main conversation endpoint — sends user message to orchestrator |
-| `/session/{id}/summary` | GET | Get all tasks/events/notes for a session |
-| `/tasks/{id}` | DELETE | Delete a task |
-| `/tasks/{id}/complete` | PATCH | Mark a task as completed |
-| `/notes/{id}` | DELETE | Delete a note |
-
-Interactive API docs: https://mapa-api-637668641799.asia-south1.run.app/docs
-
----
-
-## 🧪 Try It Live
-
-### Option 1: Use the hosted app
-Visit **https://gen-lang-client-0349644995.web.app** and start chatting. Try these:
-
-- *"Remind me to submit the report by Friday"*
-- *"Schedule a team standup tomorrow at 10 AM"*
-- *"কাল সকালে dentist-এর appointment আছে"* (Bengali)
-- *"मुझे शाम को groceries लानी है"* (Hindi)
-- Use the 🎙️ button to speak instead of typing
-
-### Option 2: Call the API directly
 ```bash
-curl -X POST https://mapa-api-637668641799.asia-south1.run.app/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message":"create a task to finish my report by Friday","session_id":"demo"}'
-```
-
----
-
-## 🏃 Local Development
-
-### Prerequisites
-- Python 3.11+
-- Node.js 18+
-- Firebase project with Firestore enabled
-- Google AI Studio API key (Gemini)
-
-### Backend
-```bash
-cd backend
-pip install -r requirements.txt
-export GEMINI_API_KEY=your-gemini-key
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/firebase-admin-key.json
-uvicorn api.main:app --reload --port 8080
-```
-
-### Frontend
-```bash
-cd frontend
+git clone https://github.com/singhakousik363-del/flippoint.git
+cd flippoint
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
----
+Open http://localhost:3000.
 
-## 📂 Project Structure
+The AI explanation layer is provider-agnostic and never computes a number — it only narrates
+results the deterministic engine already produced. At request time, FlipPoint tries **Anthropic**
+first if `ANTHROPIC_API_KEY` is configured, then falls back to **Gemini** if `GEMINI_API_KEY` is
+configured (or if the Anthropic call fails at runtime), and finally falls back to a
+**deterministic template** that needs no API key at all. All three paths produce identical
+numbers, because every number in the AI's response is checked against the exact figures it was
+given and any response citing an unverified number is discarded in favor of the template. See
+[.env.example](.env.example) for the environment variables and
+[src/lib/ai/explain.ts](src/lib/ai/explain.ts) for the provider-selection logic.
 
-```
-mapa-hackathon/
-├── backend/
-│   ├── agents/
-│   │   └── orchestrator.py       # Primary agent — coordinates sub-agents
-│   ├── tools/
-│   │   ├── mcp_base.py           # MCPTool abstract base + MCPRegistry
-│   │   ├── task_tool.py          # Task sub-agent
-│   │   ├── calendar_tool.py      # Calendar sub-agent
-│   │   ├── notes_tool.py         # Notes sub-agent
-│   │   └── firestore_client.py   # Firestore wrapper
-│   ├── api/
-│   │   └── main.py               # FastAPI app + routes
-│   ├── Dockerfile
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx               # Main chat interface
-│   │   ├── Tasks.jsx
-│   │   ├── Calendar.jsx
-│   │   └── Notes.jsx
-│   └── package.json
-├── cloudbuild.yaml               # Cloud Build deployment config
-└── README.md
+## Testing
+
+```bash
+npm test        # vitest run
+npm run build   # next build
 ```
 
----
+CI runs both on every push and pull request — see
+[.github/workflows/test.yml](.github/workflows/test.yml).
 
-## 🎬 Demo
+## Project structure
 
-A 2-minute video walkthrough was submitted during Round 1. Key scenes:
+```
+src/
+├── app/
+│   ├── api/ai/explain/route.ts   # AI explanation endpoint (Anthropic -> Gemini -> fallback)
+│   ├── decision/                 # Decision builder page
+│   ├── workspace/                # Comparison + sensitivity + AI brief page
+│   └── page.tsx                  # Landing page
+├── components/
+│   ├── decision/                 # Decision builder form components
+│   ├── landing/                  # Landing page sections
+│   ├── workspace/                # Comparison workspace, sensitivity, what-if simulator
+│   └── ui/                       # shadcn-based UI primitives
+├── lib/
+│   ├── ai/                       # AI client, prompt, and schema
+│   ├── data/                     # Emission factor catalog (emission-factors.json)
+│   ├── decision/                 # Decision compute, sensitivity, break-even, what-if
+│   ├── engine/                   # Deterministic impact calculation engine
+│   └── validation/               # Zod schemas
+├── store/                        # Zustand decision store
+└── types/                        # Shared domain types
+__tests__/                        # Vitest suites for the engine, decision layer, and AI route
+```
 
-1. User speaks in Bengali → MAPA creates a task + a calendar event
-2. User asks to list all tasks → multiple agents return data in parallel
-3. Switch to Hindi mid-session → conversation flows seamlessly
-4. Browser push notification triggers on a reminder
+## Hackathon disclosure
 
----
+Built entirely during the NextStep Hacks 2026 window (21 August – 20 September 2026). No
+pre-existing code was carried into this project. Developed solo, with Claude Code as an AI
+pair-programmer throughout.
 
-## 🌏 Why APAC Matters
-
-India alone has **~500 million non-English-first-language speakers** who use smartphones daily. Southeast Asia adds another ~300M. Most productivity tools treat these users as an afterthought. MAPA treats them as the primary audience.
-
-This isn't just a hackathon demo — it's a usable product for the APAC region, built on Google Cloud, running in `asia-south1` for single-digit-millisecond latency to Indian users.
-
----
-
-## 👤 Author
+## Author
 
 **Kousik Singha**
-Google Cloud Gen AI Academy APAC Hackathon 2026 — Cohort 2 Participant
 
----
+## License
 
-## 📜 License
-
-MIT — see `LICENSE` for details.
+MIT — see [LICENSE](LICENSE) for details.

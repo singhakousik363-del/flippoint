@@ -1,7 +1,13 @@
 {
   "name": "flippoint",
   "version": "0.1.0",
+  "description": "FlipPoint compares packaging environmental-impact decisions with a deterministic, source-cited calculation engine and shows exactly what would flip the recommendation.",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/singhakousik363-del/flippoint.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
