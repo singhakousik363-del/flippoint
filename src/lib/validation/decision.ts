@@ -1,7 +1,15 @@
 import { z } from "zod";
+import { MATERIAL_CATALOG } from "@/lib/data/catalog";
+import type { MaterialCode } from "@/types/decision";
 
-const materialCodeSchema = z.enum(["PET", "HDPE", "PP"]);
+const materialCodes = MATERIAL_CATALOG.map((m) => m.code) as [MaterialCode, ...MaterialCode[]];
+const materialCodeSchema = z.enum(materialCodes);
 const disposalPathwaySchema = z.enum(["landfill", "combustion", "recycling"]);
+
+/** True only when the catalog entry for this material has a verified recycled-content factor. */
+function materialSupportsRecycledContent(materialCode: MaterialCode): boolean {
+  return Boolean(MATERIAL_CATALOG.find((m) => m.code === materialCode)?.recycledFactorId);
+}
 
 export const reusableSettingsDraftSchema = z.object({
   maxCycles: z
@@ -41,6 +49,10 @@ export const packagingOptionDraftSchema = z
   .refine((o) => !o.reusable || o.reusableSettings !== null, {
     message: "Reusable settings are required when this option is marked reusable",
     path: ["reusableSettings"],
+  })
+  .refine((o) => materialSupportsRecycledContent(o.materialCode) || o.recycledContentPct === 0, {
+    message: "This material has no verified recycled-content factor, so recycled content must be 0%",
+    path: ["recycledContentPct"],
   });
 
 export const decisionSchema = z.object({
