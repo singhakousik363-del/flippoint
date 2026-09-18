@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRightIcon, CircleHelpIcon, SparklesIcon, ZapIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -67,6 +67,10 @@ function AnimatedValue({ value }: { value: string }) {
 }
 
 export function WhatIfSimulator({ decision }: { decision: Decision }) {
+  const prefersReducedMotion = useReducedMotion();
+  const crossfadeTransition = prefersReducedMotion ? { duration: 0 } : { duration: 0.2 };
+  const badgeTransition = prefersReducedMotion ? { duration: 0 } : { duration: 0.3, ease: "easeOut" as const };
+
   const [selectedOptionId, setSelectedOptionId] = useState(decision.options[0]?.id ?? "");
   const selectedOption = decision.options.find((o) => o.id === selectedOptionId) ?? decision.options[0];
 
@@ -238,7 +242,18 @@ export function WhatIfSimulator({ decision }: { decision: Decision }) {
                 <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                   Current
                 </span>
-                <p className="text-base font-semibold">{currentWinner?.optionName ?? "—"} wins</p>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.p
+                    key={currentWinner?.optionName ?? "none"}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={crossfadeTransition}
+                    className="text-base font-semibold"
+                  >
+                    {currentWinner?.optionName ?? "—"} wins
+                  </motion.p>
+                </AnimatePresence>
                 <p className="text-xs tabular-nums text-muted-foreground">
                   {currentWinner ? formatKgCo2e(currentWinner.perUnitImpact.central) : "—"}
                 </p>
@@ -260,13 +275,13 @@ export function WhatIfSimulator({ decision }: { decision: Decision }) {
                 <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                   Scenario
                 </span>
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="wait" initial={false}>
                   <motion.p
                     key={scenarioWinner?.optionName ?? "none"}
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 4 }}
-                    transition={{ duration: 0.2 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={crossfadeTransition}
                     className="text-base font-semibold"
                   >
                     {scenarioWinner?.optionName ?? "—"} wins
@@ -317,17 +332,22 @@ export function WhatIfSimulator({ decision }: { decision: Decision }) {
             <AnimatePresence>
               {comparison.flips && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.97, height: 0 }}
+                  initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.97, height: 0 }}
                   animate={{ opacity: 1, scale: 1, height: "auto" }}
-                  exit={{ opacity: 0, scale: 0.97, height: 0 }}
-                  transition={{ duration: 0.25 }}
+                  exit={prefersReducedMotion ? { opacity: 1, scale: 1, height: "auto" } : { opacity: 0, scale: 0.97, height: 0 }}
+                  transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.25 }}
                   className="flex flex-col gap-3"
                 >
                   <div className="flex flex-col items-center gap-1 rounded-lg border border-warning/40 bg-warning/15 px-4 py-3 text-center sm:flex-row sm:justify-center sm:gap-2">
-                    <span className="flex items-center gap-1.5 text-sm font-semibold text-warning">
+                    <motion.span
+                      initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={badgeTransition}
+                      className="flex items-center gap-1.5 text-sm font-semibold text-warning"
+                    >
                       <ZapIcon className="size-4" />
                       DECISION FLIPPED
-                    </span>
+                    </motion.span>
                     <span className="text-sm text-warning/90">
                       <strong>{scenarioWinner?.optionName}</strong> becomes preferable instead of{" "}
                       <strong>{currentWinner?.optionName}</strong>.
