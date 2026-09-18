@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AlertTriangleIcon, FlaskConicalIcon, SparklesIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AIDecisionBrief } from "@/components/workspace/ai-decision-brief";
+import { CopyShareLinkButton } from "@/components/workspace/copy-share-link-button";
 import { DownloadDecisionRecordButton } from "@/components/workspace/download-decision-record-button";
 import { HeroRecommendation } from "@/components/workspace/hero-recommendation";
 import { OptionResultCard } from "@/components/workspace/option-result-card";
@@ -16,14 +17,42 @@ import { SensitivitySection } from "@/components/workspace/sensitivity/sensitivi
 import { WhatIfSimulator } from "@/components/workspace/sensitivity/what-if-simulator";
 import { computeDecisionResults } from "@/lib/decision/compute";
 import { computeDecisionSensitivity } from "@/lib/decision/sensitivity";
+import { decodeShareParam, SHARE_PARAM } from "@/lib/decision/share-link";
 import { validateDecision } from "@/lib/decision/validate";
 import { DEMO_DECISION_NAME, useDecisionStore } from "@/store/decision-store";
 import { useDecisionStoreHydrated } from "@/store/use-hydrated";
+import type { Decision } from "@/types/decision";
+
+/** Decodes a `?share=...` param present at first paint, if any — read once
+ *  up front so a shared link renders its scenario immediately instead of
+ *  flashing whatever was in localStorage first. */
+function readSharedDecisionFromUrl(): Decision | null {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.search).get(SHARE_PARAM);
+  if (!raw) return null;
+  return decodeShareParam(raw);
+}
 
 export function ComparisonWorkspace() {
   const hydrated = useDecisionStoreHydrated();
-  const decision = useDecisionStore((s) => s.decision);
+  const storeDecision = useDecisionStore((s) => s.decision);
   const loadDemo = useDecisionStore((s) => s.loadDemo);
+  const loadFromShare = useDecisionStore((s) => s.loadFromShare);
+  const [sharedDecision] = useState<Decision | null>(readSharedDecisionFromUrl);
+
+  // Once hydrated, adopt a valid shared decision into the store itself (same
+  // convention as "Try a demo scenario") so the rest of the app — e.g. "Edit
+  // decision" — sees it too, then drop the param so a later refresh or edit
+  // doesn't get reset back to the shared snapshot.
+  useEffect(() => {
+    if (!hydrated || !sharedDecision) return;
+    loadFromShare(sharedDecision);
+    const url = new URL(window.location.href);
+    url.searchParams.delete(SHARE_PARAM);
+    window.history.replaceState(null, "", url.pathname + url.search);
+  }, [hydrated, sharedDecision, loadFromShare]);
+
+  const decision = sharedDecision ?? storeDecision;
   const { valid, errors } = useMemo(() => validateDecision(decision), [decision]);
 
   const results = useMemo(() => {
@@ -121,6 +150,7 @@ export function ComparisonWorkspace() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <CopyShareLinkButton decision={decision} />
           <DownloadDecisionRecordButton decision={decision} results={data} sensitivity={sensitivity} />
           <Button
             variant="outline"

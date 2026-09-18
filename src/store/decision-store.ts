@@ -55,6 +55,7 @@ interface DecisionStoreState {
   setReusable: (optionId: string, reusable: boolean) => void;
   resetDecision: () => void;
   loadDemo: () => void;
+  loadFromShare: (decision: Decision) => void;
 }
 
 export const useDecisionStore = create<DecisionStoreState>()(
@@ -125,6 +126,8 @@ export const useDecisionStore = create<DecisionStoreState>()(
       resetDecision: () => set({ decision: createDefaultDecision() }),
 
       loadDemo: () => set({ decision: createDemoDecision() }),
+
+      loadFromShare: (decision) => set({ decision }),
     }),
     {
       name: "flippoint-decision-draft",
