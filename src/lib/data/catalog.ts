@@ -58,6 +58,17 @@ export const MATERIAL_CATALOG: MaterialCatalogEntry[] = [
       // No "recycling" option: no verified PP recycling factor (pending).
     ],
   },
+  {
+    code: "PAPERBOARD",
+    label: "Paperboard/Cardboard (WARM: corrugated containers proxy)",
+    virginFactorId: "virgin-paperboard-production",
+    // No recycledFactorId: recycled-content interpolation factor not requested/sourced for this material.
+    disposalOptions: [
+      { pathway: "landfill", factorId: "paperboard-landfill", label: "Landfill" },
+      { pathway: "combustion", factorId: "paperboard-combustion", label: "Combustion (waste-to-energy)" },
+      { pathway: "recycling", factorId: "paperboard-recycling-credit", label: "Recycling" },
+    ],
+  },
 ];
 
 export const TRANSPORT_CATALOG: { factorId: string; label: string }[] = [

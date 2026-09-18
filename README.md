@@ -68,8 +68,17 @@ system-wide reduction relative to a landfill/virgin baseline), not emissions pro
 | PP | disposal (combustion) | 1.8078 | kgCO2e/kg | US EPA (WARM) | 2015 |
 | PET | disposal (recycling) | -1.2456 | kgCO2e/kg | US EPA (WARM) | 2015 |
 | HDPE | disposal (recycling) | -0.97 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| Virgin Paperboard (corrugated containers, WARM proxy) | production (virgin) | 0.8818 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| Paperboard | disposal (landfill) | 0.496 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| Paperboard | disposal (combustion) | -0.5291 | kgCO2e/kg | US EPA (WARM) | 2015 |
+| Paperboard | disposal (recycling) | -3.4392 | kgCO2e/kg | US EPA (WARM) | 2015 |
 | Commercial dishwasher washing energy (under-counter, high-temp sanitizing) | reuse-washing (under-counter-high-temp) | 0.35 | kWh/rack | ENERGY STAR (US EPA) | 2021 |
 | US average grid electricity | grid-electricity | 0.349667 | kgCO2e/kWh | US EPA (eGRID) | 2023 |
+
+Paper and plastic factors use different carbon-accounting conventions. WARM treats paper
+combustion CO₂ as biogenic (excluded from the total) and credits recycled paper with forest carbon
+sequestration. Paper-versus-plastic comparisons are therefore directionally useful, but the
+disposal figures are not sign-for-sign equivalent with the plastics entries.
 
 ### Documented gaps
 

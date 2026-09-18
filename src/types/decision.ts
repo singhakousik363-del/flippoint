@@ -1,6 +1,6 @@
 import type { DisposalPathway } from "@/types/domain";
 
-export type MaterialCode = "PET" | "HDPE" | "PP";
+export type MaterialCode = "PET" | "HDPE" | "PP" | "PAPERBOARD";
 
 export interface ReusableSettingsDraft {
   /** Manufacturer-rated maximum number of wash cycles before retirement. */

@@ -352,5 +352,99 @@
       "'Total output' (generation-based) rate, not a consumption/import-adjusted rate."
     ],
     "region": "US (national average)"
+  },
+  {
+    "id": "virgin-paperboard-production",
+    "material": "Virgin Paperboard (corrugated containers, WARM proxy)",
+    "category": "production",
+    "subCategory": "virgin",
+    "value": 0.8818,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Paper Products chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Paper_Products.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-18"
+    },
+    "calculationBasis": "WARM Exhibit 13 (Raw Material Acquisition and Manufacturing Emission Factor for Virgin Production of Paper Products): Corrugated Containers = process energy (Exhibit 14) 0.69 + transportation energy excluding retail (Exhibit 15) 0.10 + process non-energy (Exhibit 16) 0.01 = 0.80 MTCO2E per short ton. Exhibit 13's own published column total (0.84) embeds a 0.05 MTCO2E/short-ton retail-transportation component (Exhibit 9: Retail Transportation Energy Use and GHG Emissions for Paper Products); that component is subtracted out here for consistency with how this dataset treats retail transport for every other production factor (transport is modeled separately, per-shipment, by this engine). Converted to kg CO2e/kg using 1 short ton = 907.18474 kg (factor 1.102311).",
+    "assumptions": [
+      "WARM does not separately model 'paperboard' or 'folding cartons' as a distinct virgin-production category; Corrugated Containers is the nearest WARM-modeled paperboard/cardboard packaging material and is used here as the proxy for the paperboard/cardboard material option.",
+      "WARM's 'virgin' corrugated-containers benchmark already assumes a minimum 9.8% recycled fiber content (industry-average minimum for corrugated board, per FAL 2003a as cited in the source chapter) — unlike the near-100%-virgin PET/HDPE/PP production factors in this dataset, this is not a pure 100%-virgin-input factor.",
+      "Excludes downstream conversion of paperboard stock into a finished container/package.",
+      "Excludes retail transportation (see calculationBasis) — modeled separately, per-shipment, by this engine."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "paperboard-landfill",
+    "material": "Paperboard",
+    "category": "disposal",
+    "subCategory": "landfill",
+    "value": 0.496,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Paper Products chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Paper_Products.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-18"
+    },
+    "calculationBasis": "WARM Exhibit 27 (Landfilling Emission Factors for Paper Products): Net Emissions (Post-Consumer) for Corrugated Containers = 0.45 MTCO2E per short ton (landfill CH4 1.19 + transportation to landfill 0.04 + avoided CO2 emissions from landfill-gas energy recovery -0.07 + landfill carbon storage -0.72; CO2 from paper decomposition is biogenic and is excluded per WARM methodology). Converted to kg CO2e/kg using 1 short ton = 907.18474 kg (factor 1.102311).",
+    "assumptions": [
+      "Corrugated Containers used as the WARM proxy for paperboard/cardboard (see virgin-paperboard-production).",
+      "US national-average landfill-gas collection/flaring/energy-recovery mix and national-average landfill moisture conditions, as modeled by WARM v13.",
+      "Post-consumer waste-management stage only; excludes production."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "paperboard-combustion",
+    "material": "Paperboard",
+    "category": "disposal",
+    "subCategory": "combustion",
+    "value": -0.5291,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Paper Products chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Paper_Products.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-18"
+    },
+    "calculationBasis": "WARM Exhibit 25 (Components of the Combustion Net Emission Factor for Paper Products): Net Emissions (Post-Consumer) for Corrugated Containers = -0.48 MTCO2E per short ton (transportation to combustion 0.03 + N2O from combustion 0.04 minus avoided utility emissions from waste-to-energy electricity recovery -0.55, per Exhibit 26; CO2 from combustion of paper is biogenic and is excluded per WARM methodology). Converted to kg CO2e/kg using 1 short ton = 907.18474 kg (factor 1.102311). NEGATIVE value = net emissions reduction: the avoided-utility credit outweighs the small transport + N2O burden.",
+    "assumptions": [
+      "Corrugated Containers used as the WARM proxy for paperboard/cardboard (see virgin-paperboard-production).",
+      "US average combustion system efficiency (17.8%) and avoided-utility grid mix as modeled by WARM v13.",
+      "Post-consumer waste-management stage only; excludes production.",
+      "Unlike the plastic combustion factors in this dataset, which are net-positive, this factor is net-negative because combustion CO2 is treated as biogenic (excluded) while the avoided-utility electricity credit is retained — the sign difference is a methodological artifact of WARM's biogenic-carbon treatment for paper, not a claim that burning paperboard is cleaner than burning plastic."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
+  },
+  {
+    "id": "paperboard-recycling-credit",
+    "material": "Paperboard",
+    "category": "disposal",
+    "subCategory": "recycling",
+    "value": -3.4392,
+    "unit": "kgCO2e/kg",
+    "uncertainty": { "confidence": "low" },
+    "source": {
+      "name": "US EPA Waste Reduction Model (WARM), Version 13 — Paper Products chapter",
+      "url": "https://archive.epa.gov/epawaste/conserve/tools/warm/pdfs/Paper_Products.pdf",
+      "publicationYear": 2015,
+      "accessedDate": "2026-09-18"
+    },
+    "calculationBasis": "WARM Exhibit 18 (Recycling Emission Factor for Paper Products): Net Emissions (Post-Consumer) for Corrugated Containers = -3.12 MTCO2E per short ton, composed of the recycled-input credit relative to virgin production (process energy -0.00, transportation energy -0.05, process non-energy -0.01) plus a forest carbon sequestration credit of -3.06 MTCO2E/short ton (avoided timber harvest from reduced virgin pulpwood demand). Converted to kg CO2e/kg using 1 short ton = 907.18474 kg (factor 1.102311). NEGATIVE value = net system-wide emissions reduction relative to a landfill/virgin baseline.",
+    "assumptions": [
+      "Corrugated Containers used as the WARM proxy for paperboard/cardboard (see virgin-paperboard-production). WARM models corrugated-container recycling as a partial open loop (76% remanufactured into boxboard, 24% back into new corrugated containers).",
+      "Forest carbon sequestration accounts for roughly 98% of this credit (-3.06 of -3.12 MTCO2E/short ton) — a fundamentally different mechanism from the PET/HDPE recycling credits in this dataset, which are pure process/materials-substitution credits with no biogenic-carbon component. Do not average or directly compare this value against the plastics recycling credits without accounting for that difference.",
+      "This is a system-level avoided-burden credit, NOT a standalone material-production factor — do not interpolate against a virgin-production value the way recycled-content production factors are interpolated (methodology §6)."
+    ],
+    "gwpTimeHorizon": "GWP100",
+    "region": "US"
   }
 ]

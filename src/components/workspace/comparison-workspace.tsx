@@ -164,6 +164,13 @@ export function ComparisonWorkspace() {
               disclosure with the exact factor, value, source, and publication year behind that
               option&apos;s numbers.
             </p>
+            <p className="mt-3">
+              Paper and plastic factors use different carbon-accounting conventions. WARM treats
+              paper combustion CO₂ as biogenic (excluded from the total) and credits recycled paper
+              with forest carbon sequestration. Paper-versus-plastic comparisons are therefore
+              directionally useful, but the disposal figures are not sign-for-sign equivalent with
+              the plastics entries.
+            </p>
           </div>
         </details>
       </section>
