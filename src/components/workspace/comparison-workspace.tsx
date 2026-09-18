@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AIDecisionBrief } from "@/components/workspace/ai-decision-brief";
+import { DownloadDecisionRecordButton } from "@/components/workspace/download-decision-record-button";
 import { HeroRecommendation } from "@/components/workspace/hero-recommendation";
 import { OptionResultCard } from "@/components/workspace/option-result-card";
 import { SensitivitySection } from "@/components/workspace/sensitivity/sensitivity-section";
 import { WhatIfSimulator } from "@/components/workspace/sensitivity/what-if-simulator";
 import { computeDecisionResults } from "@/lib/decision/compute";
+import { computeDecisionSensitivity } from "@/lib/decision/sensitivity";
 import { validateDecision } from "@/lib/decision/validate";
 import { DEMO_DECISION_NAME, useDecisionStore } from "@/store/decision-store";
 import { useDecisionStoreHydrated } from "@/store/use-hydrated";
@@ -30,6 +32,15 @@ export function ComparisonWorkspace() {
       return { data: computeDecisionResults(decision), error: null as string | null };
     } catch (e) {
       return { data: null, error: e instanceof Error ? e.message : "Unknown calculation error" };
+    }
+  }, [decision, valid]);
+
+  const sensitivity = useMemo(() => {
+    if (!valid) return null;
+    try {
+      return computeDecisionSensitivity(decision);
+    } catch {
+      return null;
     }
   }, [decision, valid]);
 
@@ -109,12 +120,15 @@ export function ComparisonWorkspace() {
             {decision.businessContext ? ` · ${decision.businessContext}` : ""}
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          nativeButton={false}
-          render={<Link href="/decision">Edit decision</Link>}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <DownloadDecisionRecordButton decision={decision} results={data} sensitivity={sensitivity} />
+          <Button
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/decision">Edit decision</Link>}
+          />
+        </div>
       </div>
 
       <HeroRecommendation decision={decision} results={data} />
